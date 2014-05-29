@@ -20,6 +20,11 @@ class MoviesController < ApplicationController
     if params[:ratings] != nil
       @movies = @movies.select{ |x| params[:ratings].include? x.rating }
       @checked = params[:ratings].keys
+      flash[:checked] = @checked
+    elsif flash[:checked] != nil
+      @checked = flash[:checked]
+      @movies = @movies.select{ |x| @checked.include? x.rating }
+      flash[:checked] = @checked
     else
       @checked = Movie.all_ratings
     end
