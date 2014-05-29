@@ -16,6 +16,13 @@ class MoviesController < ApplicationController
     else
       @movies = Movie.all 
     end
+    @all_ratings = Movie.all_ratings
+    if params[:ratings] != nil
+      @movies = @movies.select{ |x| params[:ratings].include? x.rating }
+      @checked = params[:ratings].keys
+    else
+      @checked = Movie.all_ratings
+    end
   end
 
   def new

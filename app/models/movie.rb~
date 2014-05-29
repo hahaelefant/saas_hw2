@@ -7,6 +7,5 @@ class Movie < ActiveRecord::Base
     x.each do |y|
       erg.push y.rating unless erg.include? y.rating
     end
-    erg
   end
 end
