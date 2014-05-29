@@ -10,7 +10,15 @@ class MoviesController < ApplicationController
     if params[:sortBy] == "title"
       @movies = Movie.find(:all, :order => "title")
       @title = true
+      session[:sortBy] = "title"
     elsif params[:sortBy] == "release"
+      @movies = Movie.find(:all, :order => "release_date") 
+      @release = true
+      session[:sortBy] = "release"
+    elsif session[:sortBy] == "release"
+      @movies = Movie.find(:all, :order => "release_date") 
+      @release = true
+    elsif session[:sortBy] == "release"
       @movies = Movie.find(:all, :order => "release_date") 
       @release = true
     else
@@ -20,11 +28,10 @@ class MoviesController < ApplicationController
     if params[:ratings] != nil
       @movies = @movies.select{ |x| params[:ratings].include? x.rating }
       @checked = params[:ratings].keys
-      flash[:checked] = @checked
-    elsif flash[:checked] != nil
-      @checked = flash[:checked]
+      session[:checked] = @checked
+    elsif session[:checked] != nil
+      @checked = session[:checked]
       @movies = @movies.select{ |x| @checked.include? x.rating }
-      flash[:checked] = @checked
     else
       @checked = Movie.all_ratings
     end
