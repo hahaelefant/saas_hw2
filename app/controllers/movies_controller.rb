@@ -1,12 +1,13 @@
 class MoviesController < ApplicationController
 
   def show
-    id = params[:id] # retrieve movie ID from URI route
+    id = params[:id] # retrieve movie ID from URI route_to
     @movie = Movie.find(id) # look up movie by unique ID
     # will render app/views/movies/show.<extension> by default
   end
 
   def index
+    redirect = Hash.new
     if params[:sortBy] == "title"
       @movies = Movie.find(:all, :order => "title")
       @title = true
@@ -15,12 +16,9 @@ class MoviesController < ApplicationController
       @movies = Movie.find(:all, :order => "release_date") 
       @release = true
       session[:sortBy] = "release"
-    elsif session[:sortBy] == "release"
-      @movies = Movie.find(:all, :order => "release_date") 
-      @release = true
-    elsif session[:sortBy] == "release"
-      @movies = Movie.find(:all, :order => "release_date") 
-      @release = true
+    elsif session[:sortBy] != nil
+      redirect[:sortBy] = session[:sortBy]
+      @movies = Movie.all
     else
       @movies = Movie.all 
     end
@@ -30,10 +28,14 @@ class MoviesController < ApplicationController
       @checked = params[:ratings].keys
       session[:checked] = @checked
     elsif session[:checked] != nil
-      @checked = session[:checked]
-      @movies = @movies.select{ |x| @checked.include? x.rating }
+      session[:checked].each{ |y| redirect["ratings[#{y}]".to_sym]=1}
+      redirect[:sortBy] = params[:sortBy] if redirect[:sortBy] == nil
     else
       @checked = Movie.all_ratings
+    end
+    if redirect != {}
+      redirect_to movies_path(redirect)
+      redirect = Hash.new
     end
   end
 
@@ -64,5 +66,4 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-
 end
